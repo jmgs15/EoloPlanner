@@ -7,7 +7,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
-@RequestMapping("/cities")
+@RequestMapping("/api/topographicdetails/")
 public class CityLandscapeController {
 
     private CityLandscapeService cityLandscapeService;
