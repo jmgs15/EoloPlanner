@@ -5,12 +5,12 @@ function weather(call, callback) {
 
     const vowels = "aeiou";
     let firstChar = city.trim().charAt(0).toLowerCase();
-    let weather = vowels.indexOf(firstChar) !== -1 ? "sunny" : "rainy";
+    let weather = vowels.indexOf(firstChar) !== -1 ? "Sunny" : "Rainy";
 
     let waitRandomMilliSeconds = (Math.floor(Math.random() * 3) + 1) * 1000;
 
     setTimeout(function () {
-        callback(null, {weather: weather});
+        callback(null, {city: city, weather: weather});
     }, waitRandomMilliSeconds);
 }
 

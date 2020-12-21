@@ -1,13 +1,14 @@
 syntax = "proto3";
 
-message WeatherRequest {
+message GetWeatherRequest {
   string city = 1;
 }
 
-message WeatherResponse {
-  string weather = 1;
+message Weather {
+  string city = 1;
+  string weather = 2;
 }
 
 service WeatherService {
-  rpc weather(WeatherRequest) returns (WeatherResponse);
+  rpc weather(GetWeatherRequest) returns (Weather);
 }
