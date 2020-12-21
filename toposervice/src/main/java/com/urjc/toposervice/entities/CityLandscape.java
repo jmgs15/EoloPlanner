@@ -14,7 +14,6 @@ public class CityLandscape {
 
     @Id
     private String id;
-    private String city;
     private String landscape;
 
 }

@@ -17,7 +17,7 @@ public class CityLandscapeController {
     }
 
     @GetMapping("/{cityName}")
-    public Mono<CityLandscape> getCityLandscape(@PathVariable String cityName) {
+    public Mono<CityLandscape> getCityLandscape(@PathVariable String cityName)  {
         return cityLandscapeService.getCityLandscape(cityName);
     }
 
