@@ -2,6 +2,7 @@ package com.urjc.planner;
 
 import com.urjc.planner.dtos.GetTopographicInfoRequest;
 import com.urjc.planner.dtos.GetTopographicInfoResponse;
+import com.urjc.planner.queues.EoloplantCreationProgressNotificationsProducer;
 import com.urjc.planner.services.TopoServiceClient;
 import com.urjc.planner.services.WeatherServiceClient;
 import org.slf4j.Logger;
@@ -18,28 +19,36 @@ public class CommandRunner implements CommandLineRunner {
 
     private final TopoServiceClient topoServiceClient;
     private final WeatherServiceClient weatherServiceClient;
+    private final EoloplantCreationProgressNotificationsProducer eoloplantProducer;
 
-    public CommandRunner(TopoServiceClient topoServiceClient, WeatherServiceClient weatherServiceClient) {
+    public CommandRunner(TopoServiceClient topoServiceClient, WeatherServiceClient weatherServiceClient, EoloplantCreationProgressNotificationsProducer eoloplantProducer) {
         this.topoServiceClient = topoServiceClient;
         this.weatherServiceClient = weatherServiceClient;
+        this.eoloplantProducer = eoloplantProducer;
     }
 
     @Override
     public void run(String... args) throws Exception {
         logger.info("Run start");
 
-        CompletableFuture<GetTopographicInfoResponse> topography = topoServiceClient.getTopography(new GetTopographicInfoRequest("Leon"));
-        WeatherServiceOuterClass.GetWeatherRequest weatherRequest = WeatherServiceOuterClass.GetWeatherRequest.newBuilder().setCity("Leon").build();
+        String city = "Leon";
+
+        CompletableFuture<GetTopographicInfoResponse> topography = topoServiceClient.getTopography(new GetTopographicInfoRequest(city));
+        WeatherServiceOuterClass.GetWeatherRequest weatherRequest = WeatherServiceOuterClass.GetWeatherRequest.newBuilder().setCity(city).build();
         CompletableFuture<WeatherServiceOuterClass.Weather> weather = weatherServiceClient.getWeather(weatherRequest);
+
+        eoloplantProducer.sendStateChange(city);
 
         weather.whenCompleteAsync((response, error) -> {
             logger.info("Weather: Result weather: {}", response.getWeather());
             logger.info("Weather: topography.isDone: {}", topography.isDone());
+            eoloplantProducer.sendStateChange("-" + response.getWeather());
         });
 
         topography.whenCompleteAsync((response, error) -> {
             logger.info("Topography: Result topography: {}", response.getLandscape());
             logger.info("Topography: weather.isDone: {}", weather.isDone());
+            eoloplantProducer.sendStateChange("-" + response.getLandscape());
         });
 
         //CompletableFuture<Void> combinedFuture = CompletableFuture.allOf(weather, topography);
