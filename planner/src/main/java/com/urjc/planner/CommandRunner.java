@@ -33,7 +33,7 @@ public class CommandRunner implements CommandLineRunner {
     public void run(String... args) throws Exception {
         logger.info("Run start");
 
-        String city = "Leon";
+        String city = "Zaragoza";
         PlantCreation plantCreation = PlantCreation.builder()
                 .city(city)
                 .state(State.INITIAL)

@@ -1,9 +1,9 @@
 package com.urjc.planner.models;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import lombok.*;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -33,16 +33,25 @@ public class PlantCreation {
     }
 
     public String toJsonString() {
-        Gson gson = new Gson();
+        Gson gson = new GsonBuilder()
+                .serializeNulls()
+                .create();
         Map<String, Object> response = new LinkedHashMap<>();
 
         response.put("id", this.id);
         response.put("city", this.city);
         response.put("progress", this.state.getProgress());
         response.put("completed", this.completed);
+        this.planning = this.isFirstLetterLowerThanOrEqualsToM() ? this.planning.toLowerCase() : this.planning.toUpperCase();
         response.put("planning", this.completed ? this.planning : null);
 
         return gson.toJson(response);
+    }
+
+    private boolean isFirstLetterLowerThanOrEqualsToM() {
+        assert this.city != null;
+        char cityFirstLetter = this.city.toLowerCase().charAt(0);
+        return cityFirstLetter <= 'm';
     }
 
     public boolean isBothResponsesReceivedState() {

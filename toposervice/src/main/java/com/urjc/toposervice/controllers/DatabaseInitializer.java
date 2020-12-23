@@ -24,7 +24,8 @@ public class DatabaseInitializer {
                 new CityLandscape("Leon", "mountain"),
                 new CityLandscape("Alicante", "mountain"),
                 new CityLandscape("Asturias", "mountain"),
-                new CityLandscape("Almeria", "flat"));
+                new CityLandscape("Almeria", "flat"),
+                new CityLandscape("Zaragoza", "flat"));
 
         cities
                 .flatMap(this.cityLandscapeRepository::save)
