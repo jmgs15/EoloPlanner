@@ -27,16 +27,11 @@ public class CommandRunner implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         logger.info("Run start");
-        // Kick of multiple, asynchronous lookups
-        CompletableFuture<GetTopographicInfoResponse> topography = topoServiceClient.getTopography(new GetTopographicInfoRequest("Leon"));
 
+        CompletableFuture<GetTopographicInfoResponse> topography = topoServiceClient.getTopography(new GetTopographicInfoRequest("Leon"));
         WeatherServiceOuterClass.GetWeatherRequest weatherRequest = WeatherServiceOuterClass.GetWeatherRequest.newBuilder().setCity("Leon").build();
         CompletableFuture<WeatherServiceOuterClass.Weather> weather = weatherServiceClient.getWeather(weatherRequest);
-        //WeatherServiceOuterClass.Weather weather = weatherServiceClient.getWeather(weatherRequest);
 
-        final Boolean weatherFinished = false;
-        final Boolean topographyFinished = false;
-        //logger.info("Result weather: {}", weather.getWeather());
         weather.whenCompleteAsync((response, error) -> {
             logger.info("Weather: Result weather: {}", response.getWeather());
             logger.info("Weather: topography.isDone: {}", topography.isDone());
@@ -47,23 +42,9 @@ public class CommandRunner implements CommandLineRunner {
             logger.info("Topography: weather.isDone: {}", weather.isDone());
         });
 
-        //CompletableFuture.allOf(weather, topography).whenCompleteAsync((response, error) -> logger.info("Both completed"));
+        //CompletableFuture<Void> combinedFuture = CompletableFuture.allOf(weather, topography);
+        //combinedFuture.get();
+        //logger.info("Both completed");
         logger.info("Run end");
     }
-
-//        weatherServiceClient.weather(weatherRequest, new StreamObserver<WeatherServiceOuterClass.Weather>() {
-//            @Override
-//            public void onNext(WeatherServiceOuterClass.Weather response) {
-//                logger.info("Result weather: {}", response.getWeather());
-//            }
-//            @Override
-//            public void onError(Throwable throwable) {
-//                logger.info("Error");
-//            }
-//            @Override
-//            public void onCompleted() {
-//                logger.info("WeatherService completed");
-//            }
-//        });
-
 }
