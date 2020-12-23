@@ -7,9 +7,13 @@ public enum State {
     BOTH_RESPONSES_RECEIVED(75),
     PLANTE_CREATED(100);
 
-    int progress;
+    private int progress;
 
     State(int progress) {
         this.progress = progress;
+    }
+
+    public int getProgress() {
+        return this.progress;
     }
 }

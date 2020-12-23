@@ -2,6 +2,8 @@ package com.urjc.planner;
 
 import com.urjc.planner.dtos.GetTopographicInfoRequest;
 import com.urjc.planner.dtos.GetTopographicInfoResponse;
+import com.urjc.planner.models.PlantCreation;
+import com.urjc.planner.models.State;
 import com.urjc.planner.queues.EoloplantCreationProgressNotificationsProducer;
 import com.urjc.planner.services.TopoServiceClient;
 import com.urjc.planner.services.WeatherServiceClient;
@@ -32,23 +34,29 @@ public class CommandRunner implements CommandLineRunner {
         logger.info("Run start");
 
         String city = "Leon";
+        PlantCreation plantCreation = PlantCreation.builder()
+                .city(city)
+                .state(State.INITIAL)
+                .planning("")
+                .completed(false)
+                .build();
 
         CompletableFuture<GetTopographicInfoResponse> topography = topoServiceClient.getTopography(new GetTopographicInfoRequest(city));
         WeatherServiceOuterClass.GetWeatherRequest weatherRequest = WeatherServiceOuterClass.GetWeatherRequest.newBuilder().setCity(city).build();
         CompletableFuture<WeatherServiceOuterClass.Weather> weather = weatherServiceClient.getWeather(weatherRequest);
 
-        eoloplantProducer.sendStateChange(city);
+        eoloplantProducer.sendStateChange(plantCreation, city);
 
         weather.whenCompleteAsync((response, error) -> {
             logger.info("Weather: Result weather: {}", response.getWeather());
             logger.info("Weather: topography.isDone: {}", topography.isDone());
-            eoloplantProducer.sendStateChange("-" + response.getWeather());
+            eoloplantProducer.sendStateChange(plantCreation, response.getWeather());
         });
 
         topography.whenCompleteAsync((response, error) -> {
             logger.info("Topography: Result topography: {}", response.getLandscape());
             logger.info("Topography: weather.isDone: {}", weather.isDone());
-            eoloplantProducer.sendStateChange("-" + response.getLandscape());
+            eoloplantProducer.sendStateChange(plantCreation, response.getLandscape());
         });
 
         //CompletableFuture<Void> combinedFuture = CompletableFuture.allOf(weather, topography);
