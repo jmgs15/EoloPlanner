@@ -1,4 +1,4 @@
-package dtos;
+package com.urjc.planner.dtos;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,6 +9,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class GetTopographicInfoRequest {
-    private String city;
+public class GetTopographicInfoResponse {
+
+    private String id;
+    private String landscape;
 }

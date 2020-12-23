@@ -1,7 +1,7 @@
-package services;
+package com.urjc.planner.services;
 
-import dtos.GetTopographicInfoRequest;
-import dtos.GetTopographicInfoResponse;
+import com.urjc.planner.dtos.GetTopographicInfoRequest;
+import com.urjc.planner.dtos.GetTopographicInfoResponse;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -20,7 +20,7 @@ public class TopoServiceClient {
 
     @Async
     public CompletableFuture<GetTopographicInfoResponse> getTopography(GetTopographicInfoRequest request) {
-        String url = String.format("localhost:8080/api/topographicdetails/%s", request.getCity());
+        String url = "http://localhost:8080/api/topographicdetails/" + request.getCity();
         GetTopographicInfoResponse response = restTemplate.getForObject(url, GetTopographicInfoResponse.class);
         return CompletableFuture.completedFuture(response);
     }

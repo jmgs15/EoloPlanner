@@ -1,20 +1,15 @@
 package com.urjc.planner;
 
-import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.MoreExecutors;
-import dtos.GetTopographicInfoRequest;
-import dtos.GetTopographicInfoResponse;
+import com.urjc.planner.dtos.GetTopographicInfoRequest;
+import com.urjc.planner.dtos.GetTopographicInfoResponse;
+import com.urjc.planner.services.TopoServiceClient;
+import com.urjc.planner.services.WeatherServiceClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
-import services.TopoServiceClient;
-import services.WeatherServiceClient;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 @Component
 public class CommandRunner implements CommandLineRunner {
@@ -31,27 +26,44 @@ public class CommandRunner implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+        logger.info("Run start");
         // Kick of multiple, asynchronous lookups
         CompletableFuture<GetTopographicInfoResponse> topography = topoServiceClient.getTopography(new GetTopographicInfoRequest("Leon"));
-        ListenableFuture<WeatherServiceOuterClass.Weather> weather = weatherServiceClient.getWeather(WeatherServiceOuterClass.GetWeatherRequest.newBuilder().setCity("Leon").build());
 
-        // Wait until they are all done
-        //CompletableFuture.allOf(topography).join();
-        Futures.addCallback(weather, new FutureCallback<WeatherServiceOuterClass.Weather>() {
-            @Override
-            public void onSuccess(WeatherServiceOuterClass.Weather result) {
-                logger.info("Result weather: {}", result.getWeather());
-            }
+        WeatherServiceOuterClass.GetWeatherRequest weatherRequest = WeatherServiceOuterClass.GetWeatherRequest.newBuilder().setCity("Leon").build();
+        CompletableFuture<WeatherServiceOuterClass.Weather> weather = weatherServiceClient.getWeather(weatherRequest);
+        //WeatherServiceOuterClass.Weather weather = weatherServiceClient.getWeather(weatherRequest);
 
-            @Override
-            public void onFailure(Throwable t) {
-                // Should never reach here.
-                //throw new Error(t);
-                logger.info("Result topography: {}");
-            }
-        }, MoreExecutors.directExecutor());
+        final Boolean weatherFinished = false;
+        final Boolean topographyFinished = false;
+        //logger.info("Result weather: {}", weather.getWeather());
+        weather.whenCompleteAsync((response, error) -> {
+            logger.info("Weather: Result weather: {}", response.getWeather());
+            logger.info("Weather: topography.isDone: {}", topography.isDone());
+        });
 
-        topography.whenCompleteAsync((response, error) -> logger.info("Result topography: {}", response.getLandscape()));
+        topography.whenCompleteAsync((response, error) -> {
+            logger.info("Topography: Result topography: {}", response.getLandscape());
+            logger.info("Topography: weather.isDone: {}", weather.isDone());
+        });
+
+        //CompletableFuture.allOf(weather, topography).whenCompleteAsync((response, error) -> logger.info("Both completed"));
+        logger.info("Run end");
     }
+
+//        weatherServiceClient.weather(weatherRequest, new StreamObserver<WeatherServiceOuterClass.Weather>() {
+//            @Override
+//            public void onNext(WeatherServiceOuterClass.Weather response) {
+//                logger.info("Result weather: {}", response.getWeather());
+//            }
+//            @Override
+//            public void onError(Throwable throwable) {
+//                logger.info("Error");
+//            }
+//            @Override
+//            public void onCompleted() {
+//                logger.info("WeatherService completed");
+//            }
+//        });
 
 }
