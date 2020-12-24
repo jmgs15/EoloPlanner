@@ -19,4 +19,8 @@ public class PlannerApplication {
 		return new Queue("eoloplantCreationProgressNotifications", false);
 	}
 
+	@Bean
+	public Queue eoloplantCreationRequestsQueue() {
+		return new Queue("eoloplantCreationRequests", false);
+	}
 }

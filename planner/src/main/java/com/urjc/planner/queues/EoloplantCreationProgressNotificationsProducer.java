@@ -1,6 +1,6 @@
 package com.urjc.planner.queues;
 
-import com.urjc.planner.models.PlantCreation;
+import com.urjc.planner.models.PlantCreationNotification;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -11,7 +11,7 @@ public class EoloplantCreationProgressNotificationsProducer {
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
-    public void sendMessage(PlantCreation plantCreation) {
+    public void sendMessage(PlantCreationNotification plantCreation) {
 
         String data = plantCreation.toJsonString();
 
@@ -26,7 +26,7 @@ public class EoloplantCreationProgressNotificationsProducer {
     //■ 100% cuando se haya creado la planificación (concatenando las cadenas)
 
     //Crear objeto de salida con booleanos de finalizacion de los dos service
-    public synchronized void sendStateChange(PlantCreation plantCreation, String message) {
+    public synchronized void sendStateChange(PlantCreationNotification plantCreation, String message) {
         plantCreation.nextState();
         plantCreation.addResponse(message);
 
