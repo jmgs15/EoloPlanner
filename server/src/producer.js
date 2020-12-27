@@ -3,30 +3,49 @@ const CONN_URL = 'amqp://guest:guest@localhost';
 const createPlantRequestQueue = 'eoloplantCreationRequests';
 const notificationsQueue = 'eoloplantCreationProgressNotifications';
 
-let ch = null;
+let notificationChannel = null;
+let creationChannel = null;
 
 process.on('exit', (code) => {
-    ch.close();
+    notificationChannel.close();
+    creationChannel.close();
     console.log(`Closing rabbitmq channel`);
 });
 
 amqp.connect(CONN_URL, async function (err, conn) {
 
-    ch = await conn.createChannel();
+    notificationChannel = await conn.createChannel(function(error, channel) {
+        if (error) {
+            throw error;
+        }
+        channel.assertQueue(notificationsQueue, {
+            durable: true
+        });
 
-    ch.consume(notificationsQueue, function (msg) {
+        channel.consume(notificationsQueue, function (msg) {
 
-    console.log("Message:", msg.content.toString());
+                console.log("Message:", msg.content.toString());
+                //TODO: Enviar por socket el progreso
 
-        }, { noAck: true }
-    );
+            }, { noAck: true }
+        );
+    });
+
+    creationChannel = await conn.createChannel(function(error, channel) {
+        if (error) {
+            throw error;
+        }
+        channel.assertQueue(createPlantRequestQueue, {
+            durable: true
+        });
+    });
 });
 
 
 const sendMessage = (message) => {
 	
 	console.log("publishToQueue: '" + message + "'");
-	ch.sendToQueue(createPlantRequestQueue, Buffer.from(message));
+    creationChannel.sendToQueue(createPlantRequestQueue, Buffer.from(message));
 };
 
 exports.sendMessage = sendMessage;
