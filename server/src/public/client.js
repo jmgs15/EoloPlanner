@@ -1,4 +1,5 @@
 let socket = new WebSocket("ws://"+window.location.host+"/plantNotifications");
+const baseUrlPath = "http://localhost:3000/eolicplants";
 
 socket.onopen = function (e) {
     console.log("WebSocket connection established");
@@ -21,15 +22,36 @@ socket.onerror = function (error) {
 };
 
 function sendMessage() {
-    let plant = { "id": 1, "city": "Madrid" };
-    //socket.send(plant);
+    let plant = { "city": "Madrid" };
 
-    fetch('http://localhost:3000/eolicPlant', {
+    fetch(baseUrlPath, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(plant)
+    })
+        .then(function(response) {
+            if(response.ok) {
+                return response.text()
+            } else {
+                throw "Error en la llamada Ajax";
+            }
+        })
+        .then(function(texto) {
+            console.log(texto);
+        })
+        .catch(function(err) {
+            console.log(err);
+        });
+}
+
+function loadCities() {
+    fetch(baseUrlPath, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
     })
         .then(function(response) {
             if(response.ok) {

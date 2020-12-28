@@ -3,6 +3,7 @@ const { Sequelize, DataTypes } = require('sequelize');
 const database = "eoloplant";
 const plantRoutes = require('../routes/plant');
 const plantModel = require('../models/plant');
+const queue = require('./queue');
 
 async function initialize(app) {
     // create db if it doesn't already exist
@@ -16,7 +17,7 @@ async function initialize(app) {
     let Plant = plantModel(sequelize, DataTypes);
 
     // Plant routes
-    plantRoutes(app, Plant);
+    plantRoutes(app, Plant, queue);
 
     // sync all models with database
     await sequelize.sync();

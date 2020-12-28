@@ -1,12 +1,13 @@
 module.exports = (sequelize, DataTypes) => {
     const Plant = sequelize.define('plant', {
-        city: {
+        id: {
             primaryKey: true,
-            type: DataTypes.STRING
+            type: DataTypes.INTEGER,
+            autoIncrement: true
         },
-        progress: {
-            allowNull: false,
-            type: DataTypes.INTEGER
+        city: {
+            type: DataTypes.STRING,
+            allowNull: false
         }
     });
     return Plant;
