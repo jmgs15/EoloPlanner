@@ -9,13 +9,12 @@ let creationChannel = null;
 async function initialize(wss) {
     amqp.connect(CONN_URL, async function (err, conn) {
 
-        console.log("CONEXION COLAS RABBIT");
         notificationChannel = await conn.createChannel(function(error, channel) {
             if (error) {
                 throw error;
             }
             channel.assertQueue(notificationsQueue, {
-                durable: true
+                durable: false
             });
 
             channel.consume(notificationsQueue, function (msg) {
@@ -35,7 +34,7 @@ async function initialize(wss) {
                 throw error;
             }
             channel.assertQueue(createPlantRequestQueue, {
-                durable: true
+                durable: false
             });
         });
     });

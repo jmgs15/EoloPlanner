@@ -5,6 +5,8 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Random;
+
 @Component
 public class EoloplantCreationProgressNotificationsProducer {
 
@@ -34,6 +36,12 @@ public class EoloplantCreationProgressNotificationsProducer {
 
         if (plantCreation.isBothResponsesReceivedState()) {
             //{ "id": 1, "city": "Madrid", "progress": 100, "completed": true, "planning": "madrid-sunny-flat" }
+            try {
+                int randomMilliSeconds = (new Random().nextInt(3) + 1) * 1000;
+                Thread.sleep(randomMilliSeconds);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             plantCreation.finish();
             sendMessage(plantCreation);
         }
