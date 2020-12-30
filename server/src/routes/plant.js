@@ -1,3 +1,5 @@
+const relatedCityClients = require('../models/relatedCityClients');
+
 module.exports = (app, Plant, queue) => {
 
     app.get("/eolicplants/", (req, res) =>
@@ -13,6 +15,7 @@ module.exports = (app, Plant, queue) => {
                 progress: 0,
                 completed: false,
                 planning: null });
+            relatedCityClients.add(result.id, req.headers.socketid);
             queue.sendMessage(JSON.stringify({id: result.id, city: result.city}));
         }).catch(function (err) {
             console.log(err);

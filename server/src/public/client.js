@@ -1,6 +1,7 @@
 let socket = new WebSocket("ws://"+window.location.host+"/plantNotifications");
 const baseUrlPath = "http://localhost:3000/eolicplants";
 let plantsCreated = [];
+let socketId = null;
 
 loadCities();
 
@@ -9,9 +10,13 @@ socket.onopen = function (e) {
 };
 
 socket.onmessage = function (event) {
-    let plant = JSON.parse(event.data);
-    console.log(`Message from socket: ${plant}`);
-    updateProgress(plant);
+    let content = JSON.parse(event.data);
+    console.log(`Message from socket: ${JSON.stringify(content)}`);
+    if (content.socketId) {
+        socketId = content.socketId;
+    } else {
+        updateProgress(content);
+    }
 };
 
 socket.onclose = function (event) {
@@ -50,7 +55,8 @@ function createPlant() {
     fetch(baseUrlPath, {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'socketid': socketId
         },
         body: JSON.stringify(plant)
     })
