@@ -21,6 +21,12 @@ public class CityLandscapeController {
         return cityLandscapeService.getCityLandscape(cityName);
     }
 
+    @GetMapping("/cityLandscapes")
+    @CrossOrigin("http://localhost:3000")
+    public Flux<CityLandscape> getCityLandscapes() {
+        return cityLandscapeService.findAll();
+    }
+
     @PostMapping
     public Flux<CityLandscape> createCityLandscapes(@RequestBody Flux<CityLandscape> cities) {
         return cities.flatMap(cityLandscapeService::createCityLandscape);
