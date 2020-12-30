@@ -36,14 +36,18 @@ public class EoloplantCreationProgressNotificationsProducer {
 
         if (plantCreation.isBothResponsesReceivedState()) {
             //{ "id": 1, "city": "Madrid", "progress": 100, "completed": true, "planning": "madrid-sunny-flat" }
-            try {
-                int randomMilliSeconds = (new Random().nextInt(3) + 1) * 1000;
-                Thread.sleep(randomMilliSeconds);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
             plantCreation.finish();
+            sleep();
             sendMessage(plantCreation);
+        }
+    }
+
+    private void sleep() {
+        try {
+            int randomMilliSeconds = (new Random().nextInt(3) + 1) * 1000;
+            Thread.sleep(randomMilliSeconds);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 }
