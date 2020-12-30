@@ -20,12 +20,12 @@ public class DatabaseInitializer {
     public void initializeDatabase() {
 
         Flux<CityLandscape> cities = Flux.just(
-                new CityLandscape("Madrid", "flat"),
-                new CityLandscape("Leon", "mountain"),
-                new CityLandscape("Alicante", "mountain"),
-                new CityLandscape("Asturias", "mountain"),
-                new CityLandscape("Almeria", "flat"),
-                new CityLandscape("Zaragoza", "flat"));
+                new CityLandscape("madrid", "flat"),
+                new CityLandscape("leon", "mountain"),
+                new CityLandscape("alicante", "mountain"),
+                new CityLandscape("asturias", "mountain"),
+                new CityLandscape("almeria", "flat"),
+                new CityLandscape("zaragoza", "flat"));
 
         cities
                 .flatMap(this.cityLandscapeRepository::save)

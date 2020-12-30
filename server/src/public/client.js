@@ -143,7 +143,7 @@ function loadAvailableCities() {
 
 function isCityAvailable(nameCity){
     for (var i=0; i < availableCitiesCreated.length; i++) {
-        if (availableCitiesCreated[i].city === nameCity) {
+        if (availableCitiesCreated[i].city.toLowerCase() === nameCity.toLowerCase()) {
             return true;
         }
     }

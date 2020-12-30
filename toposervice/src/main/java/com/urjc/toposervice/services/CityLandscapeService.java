@@ -27,7 +27,7 @@ public class CityLandscapeService {
     public Mono<CityLandscape> getCityLandscape(String city) {
         int randomSeconds = new Random().nextInt(3) + 1;
         System.out.println(randomSeconds);
-        return this.cityLandscapeRepository.findById(city)
+        return this.cityLandscapeRepository.findById(city.toLowerCase())
                 .delayElement(Duration.ofSeconds(randomSeconds))
                 .switchIfEmpty(
                         Mono.error(new ResponseStatusException(
