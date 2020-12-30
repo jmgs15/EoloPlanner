@@ -5,7 +5,7 @@ let plantsCreated = [];
 let availableCitiesCreated = [];
 
 loadAvailableCities();
-loadCities();
+loadEolicPlants();
 
 socket.onopen = function (e) {
     console.log("WebSocket connection established");
@@ -48,8 +48,7 @@ function manageCreatingPlantButton() {
 
 function createPlant() {
     let city = document.getElementById("city").value;
-    let plant = {"city": city};
-    console.log(availableCitiesCreated.entries())
+    let plant = {"city": city, "progress": 0};
 
     if (city == "" || !isCityAvailable(city)) {
         alert("You must enter a valid city");
@@ -94,7 +93,7 @@ function addCityLandscapeToList(cityLandscape) {
     ul.appendChild(li);
 }
 
-function loadCities() {
+function loadEolicPlants() {
     fetch(baseUrlPath, {
         method: 'GET',
         headers: {

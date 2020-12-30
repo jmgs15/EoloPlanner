@@ -8,6 +8,9 @@ module.exports = (sequelize, DataTypes) => {
         city: {
             type: DataTypes.STRING,
             allowNull: false
+        },
+        progress: {
+            type: DataTypes.INTEGER,
         }
     });
     return Plant;
