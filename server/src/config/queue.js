@@ -1,4 +1,5 @@
 const amqp = require('amqplib/callback_api');
+const db = require('../config/database');
 const CONN_URL = 'amqp://guest:guest@localhost';
 const createPlantRequestQueue = 'eoloplantCreationRequests';
 const notificationsQueue = 'eoloplantCreationProgressNotifications';
@@ -10,7 +11,7 @@ let creationChannel = null;
 async function initialize(wss) {
     amqp.connect(CONN_URL, async function (err, conn) {
 
-        notificationChannel = await conn.createChannel(function(error, channel) {
+        notificationChannel = await conn.createChannel(function (error, channel) {
             if (error) {
                 throw error;
             }
@@ -19,7 +20,6 @@ async function initialize(wss) {
             });
 
             channel.consume(notificationsQueue, function (msg) {
-
                     console.log("Message:", msg.content.toString());
                     let plant = JSON.parse(msg.content.toString());
                     wss.clients.forEach(function (client) {
@@ -30,12 +30,12 @@ async function initialize(wss) {
                             // }
                         }
                     });
-
-                }, { noAck: true }
+                    updateDatabase(JSON.parse(msg.content))
+                }, {noAck: true}
             );
         });
 
-        creationChannel = await conn.createChannel(function(error, channel) {
+        creationChannel = await conn.createChannel(function (error, channel) {
             if (error) {
                 throw error;
             }
@@ -52,13 +52,16 @@ process.on('exit', (code) => {
     console.log(`Closing rabbitmq channel`);
 });
 
-
-
 const sendMessage = (message) => {
-	
-	console.log("publishToQueue: '" + message + "'");
+    console.log("publishToQueue: '" + message + "'");
     creationChannel.sendToQueue(createPlantRequestQueue, Buffer.from(message));
 };
+
+function updateDatabase(plantInfo) {
+    db.Plant.update(
+        {progress: plantInfo.progress},
+        {where: {id: plantInfo.id}})
+}
 
 module.exports.initialize = initialize;
 module.exports.sendMessage = sendMessage;
