@@ -1,7 +1,10 @@
 let socket = new WebSocket("ws://" + window.location.host + "/plantNotifications");
 const baseUrlPath = "http://localhost:3000/eolicplants";
+const topographyUrlPath = "http://localhost:8080/api/topographicdetails/cityLandscapes";
 let plantsCreated = [];
+let availableCitiesCreated = [];
 
+loadAvailableCities();
 loadCities();
 
 socket.onopen = function (e) {
@@ -46,8 +49,9 @@ function manageCreatingPlantButton() {
 function createPlant() {
     let city = document.getElementById("city").value;
     let plant = {"city": city};
+    console.log(availableCitiesCreated.entries())
 
-    if (city == "") {
+    if (city == "" || !isCityAvailable(city)) {
         alert("You must enter a valid city");
     } else {
         fetch(baseUrlPath, {
@@ -82,6 +86,14 @@ function addPlantToList(plant) {
     ul.appendChild(li);
 }
 
+function addCityLandscapeToList(cityLandscape) {
+    availableCitiesCreated.push({city: cityLandscape.id});
+    let ul = document.getElementById("availableCities");
+    let li = document.createElement("li");
+    li.appendChild(document.createTextNode(cityLandscape.id));
+    ul.appendChild(li);
+}
+
 function loadCities() {
     fetch(baseUrlPath, {
         method: 'GET',
@@ -104,5 +116,38 @@ function loadCities() {
         .catch(function (err) {
             console.log(err);
         });
+}
+
+function loadAvailableCities() {
+    fetch(topographyUrlPath, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+        .then(function (response) {
+            if (response.ok) {
+                return response.json();
+            } else {
+                throw "Error getting eolic plants created";
+            }
+        })
+        .then(function (landscapes) {
+            for (let landscape of landscapes) {
+                addCityLandscapeToList(landscape);
+            }
+        })
+        .catch(function (err) {
+            console.log(err);
+        });
+}
+
+function isCityAvailable(nameCity){
+    for (var i=0; i < availableCitiesCreated.length; i++) {
+        if (availableCitiesCreated[i].city === nameCity) {
+            return true;
+        }
+    }
+    return false
 }
 
