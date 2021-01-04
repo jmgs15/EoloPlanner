@@ -17,7 +17,7 @@ db.initialize(app);
 socket.initialize(app, wss);
 queue.initialize(wss)
 
-app.use(express.static('public'));
+app.use(express.static(__dirname + '/public'));
 app.use(bodyParser.json());
 
 app.listen(PORT, () => console.log(`Server listening on port: ${PORT}`));
