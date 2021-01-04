@@ -4,7 +4,7 @@ function exec(serviceName, command){
  console.log(`Installing dependencies for [${serviceName}]`);
  console.log(`Folder: ./${serviceName} Command: ${command}`);
 
- spawnSync(command, [], { './' + serviceName, shell: true, stdio: 'inherit' });
+ spawnSync(command, [], { cwd: './' + serviceName, shell: true, stdio: 'inherit' });
 }
 exec('weatherservice', 'npm install');
 exec('toposervice', 'mvn install');

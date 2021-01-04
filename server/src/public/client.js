@@ -4,6 +4,7 @@ const topographyUrlPath = "http://localhost:8080/api/topographicdetails/cityLand
 let plantsCreated = [];
 let availableCitiesCreated = [];
 let socketId = null;
+let localPlant = null;
 
 loadAvailableCities();
 loadEolicPlants();
@@ -39,24 +40,25 @@ function updateProgress(plant) {
 
     if (plant.progress === 100) {
         progressText.innerText = "";
-        manageCreatingPlantButton();
+        manageCreatingPlantButton(plant);
         addPlantToList(plant);
     } else {
         progressText.innerText = `Creating plant in ${plant.city}, progress:  ${plant.progress}%`;
     }
 }
 
-function manageCreatingPlantButton() {
-    let creationButton = document.getElementById("creationButton");
-    creationButton.disabled ? creationButton.disabled = false : creationButton.disabled = true;
+function manageCreatingPlantButton(plant) {
+    if (plant.id == localPlant.id) {
+        let creationButton = document.getElementById("creationButton");
+        creationButton.disabled ? creationButton.disabled = false : creationButton.disabled = true;
+    }
 }
 
 function createPlant() {
     let city = document.getElementById("city").value;
     let plant = {"city": city, "progress": 0};
 
-    //if (city == "" || !isCityAvailable(city)) {
-    if (city == "") {
+    if (city == "" || !isCityAvailable(city)) {
         alert("You must enter a valid city");
     } else {
         fetch(baseUrlPath, {
@@ -69,13 +71,15 @@ function createPlant() {
         })
             .then(function (response) {
                 if (response.ok) {
-                    manageCreatingPlantButton();
-                    return response.json()
+                    return response.json();
                 } else {
                     throw "Error en la llamada Ajax";
                 }
             })
             .then(function (plant) {
+                console.log(`Message from post: ${JSON.stringify(plant)}`);
+                localPlant = plant;
+                manageCreatingPlantButton(plant);
                 updateProgress(plant);
             })
             .catch(function (err) {

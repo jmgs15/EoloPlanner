@@ -23,7 +23,7 @@ async function initialize(wss) {
                     console.log("Message:", msg.content.toString());
                     let plant = JSON.parse(msg.content.toString());
                     wss.clients.forEach(function (client) {
-                        if (client.id == relatedCityClients.getClient(plant.id).client) {
+                        if (plant.progress == 100 || client.id == relatedCityClients.getClient(plant.id).client) {
                             client.send(msg.content.toString());
                             // if (plant.progress == 100) {
                             //     relatedCityClients.remove(plant.id);
