@@ -1,21 +1,24 @@
 const amqp = require('amqplib/callback_api');
-const db = require('../config/database');
+const { Plant } = require('../models/plant');
 const CONN_URL = 'amqp://guest:guest@localhost';
 const createPlantRequestQueue = 'eoloplantCreationRequests';
 const notificationsQueue = 'eoloplantCreationProgressNotifications';
 const relatedCityClients = require('../models/relatedCityClients');
 
-let notificationChannel = null;
-let creationChannel = null;
+let rabbitChannel = null;
 
 async function initialize(wss) {
     amqp.connect(CONN_URL, async function (err, conn) {
 
-        notificationChannel = await conn.createChannel(function (error, channel) {
+        rabbitChannel = await conn.createChannel(function (error, channel) {
             if (error) {
                 throw error;
             }
             channel.assertQueue(notificationsQueue, {
+                durable: false
+            });
+
+            channel.assertQueue(createPlantRequestQueue, {
                 durable: false
             });
 
@@ -34,31 +37,21 @@ async function initialize(wss) {
                 }, {noAck: true}
             );
         });
-
-        creationChannel = await conn.createChannel(function (error, channel) {
-            if (error) {
-                throw error;
-            }
-            channel.assertQueue(createPlantRequestQueue, {
-                durable: false
-            });
-        });
     });
 }
 
 process.on('exit', (code) => {
-    notificationChannel.close();
-    creationChannel.close();
+    rabbitChannel.close();
     console.log(`Closing rabbitmq channel`);
 });
 
 const sendMessage = (message) => {
     console.log("publishToQueue: '" + message + "'");
-    creationChannel.sendToQueue(createPlantRequestQueue, Buffer.from(message));
+    rabbitChannel.sendToQueue(createPlantRequestQueue, Buffer.from(message));
 };
 
 function updateDatabase(plantInfo) {
-    db.Plant.update(
+    Plant.update(
         {progress: plantInfo.progress},
         {where: {id: plantInfo.id}})
 }
