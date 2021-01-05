@@ -7,7 +7,7 @@ const relatedCityClients = require('../models/relatedCityClients');
 
 let rabbitChannel = null;
 
-async function initialize(wss) {
+async function initialize() {
     amqp.connect(CONN_URL, async function (err, conn) {
 
         rabbitChannel = await conn.createChannel(function (error, channel) {
@@ -25,12 +25,10 @@ async function initialize(wss) {
             channel.consume(notificationsQueue, function (msg) {
                     console.log("Message:", msg.content.toString());
                     let plant = JSON.parse(msg.content.toString());
-                    wss.clients.forEach(function (client) {
+                    const { connectedUsers } = require('./socket');
+                    connectedUsers.forEach(function (client) {
                         if (plant.progress == 100 || client.id == relatedCityClients.getClient(plant.id).client) {
                             client.send(msg.content.toString());
-                            // if (plant.progress == 100) {
-                            //     relatedCityClients.remove(plant.id);
-                            // }
                         }
                     });
                     updateDatabase(JSON.parse(msg.content))

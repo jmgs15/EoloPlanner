@@ -1,14 +1,10 @@
-//https://tomasmalio.medium.com/node-js-express-y-mysql-con-sequelize-ec0a7c0ae292
-//https://www.youtube.com/watch?v=bOHysWYMZM0
-const { app, expressWs } = require('./app');
+const { app } = require('./app');
 const PORT = 3000;
 
-const db = require('./config/database');
-const socket = require('./config/socket');
+const { sequelize } = require('./config/sequelize');
 const queue = require('./config/queue');
 
-let wss = expressWs.getWss('/notifications');
-
-db.initialize()
-    .then(() => queue.initialize(wss))
-    .then(() => app.listen(PORT, () => console.log(`Server listening on port: ${PORT}`)));
+sequelize.sync({ force: false })
+    .then(() => queue.initialize())
+    .then(() => app.listen(PORT, () => console.log(`Server listening on port: ${PORT}`)))
+    .catch(error => console.error(error));

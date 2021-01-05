@@ -1,25 +1,25 @@
-const app = require('../app');
-
 let id = 0;
 function createUniqueId() {
     id++;
     return id;
 }
-let users = [];
+let connectedUsers = [];
 
 function plantNotificationWebSocket(ws, req) {
     let newId = createUniqueId();
     ws.id = newId;
-    //sendCreatedId(wss, newId);
+    connectedUsers[newId] = ws;
     console.log(`User ${ws.id} connected`);
     ws.send(JSON.stringify({socketId: ws.id}))
 
-    ws.on('close', function (ws) {
-        const removeIndex = users.indexOf(ws);
-        users.splice(removeIndex, 1);
+    ws.on('close', function (wss) {
+        console.log(`User ${ws.id} disconnected`);
+        const removeIndex = connectedUsers.indexOf(ws.id);
+        connectedUsers.splice(removeIndex, 1);
     });
 };
 
 module.exports = {
+    connectedUsers,
     plantNotificationWebSocket
 };

@@ -4,7 +4,7 @@ const topographyUrlPath = "http://localhost:8080/api/topographicdetails/cityLand
 let plantsCreated = [];
 let availableCitiesCreated = [];
 let socketId = null;
-let localPlant = null;
+let localPlant = { id: -1 };
 
 loadAvailableCities();
 loadEolicPlants();

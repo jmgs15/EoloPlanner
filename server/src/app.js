@@ -1,6 +1,3 @@
-//https://tomasmalio.medium.com/node-js-express-y-mysql-con-sequelize-ec0a7c0ae292
-//https://www.youtube.com/watch?v=bOHysWYMZM0
-
 let express = require('express');
 let bodyParser = require('body-parser');
 let app = express();
