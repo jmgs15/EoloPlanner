@@ -5,7 +5,7 @@ function createUniqueId() {
 }
 let connectedUsers = [];
 
-function plantNotificationWebSocket(ws, req) {
+const plantNotificationWebSocket = (ws, req) => {
     let newId = createUniqueId();
     ws.id = newId;
     connectedUsers[newId] = ws;

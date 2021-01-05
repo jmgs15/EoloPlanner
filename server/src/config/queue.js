@@ -25,7 +25,7 @@ async function initialize() {
             channel.consume(notificationsQueue, function (msg) {
                     console.log("Message:", msg.content.toString());
                     let plant = JSON.parse(msg.content.toString());
-                    const { connectedUsers } = require('./socket');
+                    const { connectedUsers } = require('../endpoints/socket');
                     connectedUsers.forEach(function (client) {
                         if (plant.progress == 100 || client.id == relatedCityClients.getClient(plant.id).client) {
                             client.send(msg.content.toString());
@@ -54,5 +54,7 @@ function updateDatabase(plantInfo) {
         {where: {id: plantInfo.id}})
 }
 
-module.exports.initialize = initialize;
-module.exports.sendMessage = sendMessage;
+module.exports = {
+    initialize,
+    sendMessage
+};
